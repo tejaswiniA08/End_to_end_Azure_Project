@@ -1,0 +1,9 @@
+{
+	"name": "teja-df-azureproj",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "530de5ce-41df-4005-b847-9c2d40b55417",
+		"tenantId": "170bbabd-a2f0-4c90-ad4b-0e8f0f0c4259"
+	}
+}
