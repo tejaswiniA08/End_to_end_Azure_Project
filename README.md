@@ -15,25 +15,20 @@ All Azure services are organized under a single **Resource Group** for simplifie
 * Resource Group: `Teja_azuregroup`
 * Region: **East US**
 * Services deployed:
+<img width="210" height="202" alt="Screenshot 2026-01-02 at 5 52 44 PM" src="https://github.com/user-attachments/assets/499e01ed-0041-4aae-ba25-9e1f07a8b210" />
+
 
   * Azure Data Factory
   * Azure SQL Database
   * Azure Storage Account
   * Azure Databricks
 
-This setup mirrors how real-world Azure data platforms are structured.
-
 ---
 
 ## High-Level ELT Architecture
 
 
-The project follows a **modern ELT architecture**:
-
-* Raw data is ingested into a **Data Lake**
-* Transformations occur downstream
-* Version control and collaboration are managed using **GitHub**
-* Analytical models are built on curated datasets
+The project follows a modern ELT architecture, where raw data is incrementally ingested from an Azure SQL Database into a cloud data lake using Azure Data Factory, and transformed at scale using Azure Databricks.
 
 This approach improves scalability, performance, and maintainability.
 
@@ -49,7 +44,7 @@ The ingestion pipeline is implemented using **Azure Data Factory** and designed 
 
 * **ForEach activity** loops through multiple source tables
 * **Lookup activity (`last_cdc`)** retrieves the last processed CDC value
-* **Copy activity** moves only new or updated records from Azure SQL DB to the data lake
+* **Copy activity** moves only new or updated records from Azure SQL DB to the data lake(bronze layer)
 * **If Condition activity** checks whether new records exist before loading
 
 
