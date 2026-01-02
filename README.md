@@ -3,6 +3,8 @@
 
 This project demonstrates a **production-style Azure data engineering pipeline** built using Azure Data Factory, Azure SQL Database, and cloud data engineering best practices such as **incremental ingestion, looping pipelines, and ELT architecture**.
 
+<img width="786" height="302" alt="Screenshot 2025-12-29 at 5 29 43 PM" src="https://github.com/user-attachments/assets/c3a79499-4668-48d7-8d0b-a70be693a91b" />
+
 ---
 
 ## Azure Resource Setup
@@ -52,17 +54,37 @@ The ingestion pipeline is implemented using **Azure Data Factory** and designed 
 * **Copy activity** moves only new or updated records from Azure SQL DB to the data lake
 * **If Condition activity** checks whether new records exist before loading
 
-This design avoids full table reloads and supports **efficient, scalable ingestion**.
 
 ---
 
-## Key Features
+## Medallion Architecture & Databricks ELT Transformations
+<img width="1186" height="438" alt="Screenshot 2026-01-02 at 3 36 47 PM" src="https://github.com/user-attachments/assets/c5556148-e33c-4dab-a4ee-a4e4d8560556" />
 
-* Incremental data ingestion using CDC logic
-* Looping pipelines for multiple tables
-* Conditional execution to prevent unnecessary loads
-* Cloud-native orchestration with Azure Data Factory
-* Enterprise-style Azure resource organization
+
+### 🥉 Bronze Layer – Raw Data Ingestion
+
+* Incremental data ingested from **Azure SQL Database** to **Azure Data Lake** using **Azure Data Factory**
+* Change Data Capture (CDC) logic ensures only new or updated records are processed
+* Raw data is stored without transformation to preserve source fidelity and enable reprocessing
 
 ---
+
+### 🥈 Silver Layer – Cleansed & Enriched Data (Databricks)
+
+Transformations are performed in Databricks using **Apache Spark** with a focus on reliability and scalability.
+
+**Key implementation details:**
+
+* **Databricks Auto Loader** for incremental file ingestion from the data lake
+* **Spark Structured Streaming** to handle continuous data arrival
+* **Idempotent processing** to avoid duplicate records across re-runs
+* **Schema evolution support** to automatically adapt to upstream schema changes
+* Data quality checks, type casting, deduplication, and standardization
+
+Transformation logic is modularized into reusable Databricks notebooks/scripts (included in the repository).
+
+---
+
+
+
 
