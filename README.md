@@ -3,8 +3,6 @@
 
 This project demonstrates a **production-style Azure data engineering pipeline** built using Azure Data Factory, Azure SQL Database, and cloud data engineering best practices such as **incremental ingestion, looping pipelines, and ELT architecture**.
 
-<img width="786" height="302" alt="Screenshot 2025-12-29 at 5 29 43 PM" src="https://github.com/user-attachments/assets/c3a79499-4668-48d7-8d0b-a70be693a91b" />
-
 ---
 
 ## Azure Resource Setup
