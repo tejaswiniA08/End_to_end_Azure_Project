@@ -1,7 +1,7 @@
 
 # End-to-End Azure Data Engineering Project
 
-This project demonstrates a **production-style Azure data engineering pipeline** built using Azure Data Factory, Azure SQL Database, and cloud data engineering best practices such as **incremental ingestion, looping pipelines, and ELT architecture**.
+This project demonstrates a **production-style Azure data engineering pipeline** built using Azure Data Factory, Azure SQL Database, Azure Databricks and cloud data engineering best practices such as **incremental ingestion, looping pipelines, Trnasformations and ELT architecture**.
 
 ---
 
