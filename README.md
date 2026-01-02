@@ -46,12 +46,13 @@ The ingestion pipeline is implemented using **Azure Data Factory** and designed 
 * **Lookup activity (`last_cdc`)** retrieves the last processed CDC value
 * **Copy activity** moves only new or updated records from Azure SQL DB to the data lake(bronze layer)
 * **If Condition activity** checks whether new records exist before loading
-
+<img width="600" height="438" alt="Screenshot 2026-01-02 at 3 36 47 PM" src="https://github.com/user-attachments/assets/c5556148-e33c-4dab-a4ee-a4e4d8560556" />
 
 ---
 
 ## Medallion Architecture & Databricks ELT Transformations
-<img width="1186" height="438" alt="Screenshot 2026-01-02 at 3 36 47 PM" src="https://github.com/user-attachments/assets/c5556148-e33c-4dab-a4ee-a4e4d8560556" />
+
+<img width="500" height="133" alt="Screenshot 2026-01-02 at 5 57 39 PM" src="https://github.com/user-attachments/assets/b74caf7c-d30c-488a-973c-423ad7f68f35" />
 
 
 ### 🥉 Bronze Layer – Raw Data Ingestion
