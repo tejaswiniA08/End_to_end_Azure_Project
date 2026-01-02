@@ -31,7 +31,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT *\nFROM [@{pipeline().parameters.schema}].[@{pipeline().parameters.table}]\nWHERE [@{pipeline().parameters.cdc_col}] > '@{activity('last_cdc').output.value[0].cdc}'\n",
+							"value": "SELECT *\nFROM @{pipeline().parameters.schema}.@{pipeline().parameters.table}\nWHERE @{pipeline().parameters.cdc_col} >\n'@{if(\n    empty(pipeline().parameters.last_date),\n    activity('last_cdc').output.value[0].cdc,\n    pipeline().parameters.last_date\n)}'\n\n",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -179,7 +179,7 @@
 										}
 									}
 								},
-								"enableLogging": true,
+								"enableLogging": false,
 								"storeSettings": {
 									"type": "AzureBlobFSReadSettings",
 									"recursive": true,
@@ -304,6 +304,9 @@
 				"type": "string"
 			},
 			"cdc_col": {
+				"type": "string"
+			},
+			"last_date": {
 				"type": "string"
 			}
 		},
