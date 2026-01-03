@@ -34,7 +34,7 @@ This approach improves scalability, performance, and maintainability.
 
 ---
 
-## Incremental Ingestion Pipeline (Azure Data Factory)
+## Incremental Ingestion Pipeline (Azure Data Factory)(SQL DB to Data Lake Gen2)
 <img width="573" height="268" alt="Screenshot 2026-01-02 at 2 41 59 PM" src="https://github.com/user-attachments/assets/e74b3d5e-ec81-496e-ae74-e35264706f6e" />
 
 
