@@ -1,84 +1,150 @@
-
 # End-to-End Azure Data Engineering Project
 
-This project demonstrates a **production-style Azure data engineering pipeline** built using Azure Data Factory, Azure SQL Database, Azure Databricks and cloud data engineering best practices such as **incremental ingestion, looping pipelines, Transformations and ELT architecture**.
+This project demonstrates an **Azure-based data engineering pipeline** built using **Azure Data Factory**, **Azure SQL Database**, **Azure Data Lake Gen2**, and **Azure Databricks**.
+The implementation follows an **ELT-based medallion architecture** with **incremental ingestion and transformations**.
 
 ---
 
 ## Azure Resource Setup
 
-<img width="1458" height="694" alt="Screenshot 2025-12-30 at 3 19 18 PM" src="https://github.com/user-attachments/assets/ac02b1f7-8c89-4e75-b506-3c040a81d315" />
+All Azure services are organized under a single **Resource Group**.
 
+<img width="1458" alt="Azure Resources" src="https://github.com/user-attachments/assets/ac02b1f7-8c89-4e75-b506-3c040a81d315" />
 
-All Azure services are organized under a single **Resource Group** for simplified management and cost tracking.
+**Resource details:**
 
 * Resource Group: `Teja_azuregroup`
-* Region: **East US**
-* Services deployed:
-<img width="210" height="202" alt="Screenshot 2026-01-02 at 5 52 44 PM" src="https://github.com/user-attachments/assets/499e01ed-0041-4aae-ba25-9e1f07a8b210" />
-
+* Region: East US
+* Services:
 
   * Azure Data Factory
   * Azure SQL Database
-  * Azure Storage Account
+  * Azure Storage Account (Data Lake Gen2)
   * Azure Databricks
+
+<img width="210" alt="Azure Services" src="https://github.com/user-attachments/assets/499e01ed-0041-4aae-ba25-9e1f07a8b210" />
 
 ---
 
 ## High-Level ELT Architecture
 
+The project follows an **ELT architecture**, where raw data is incrementally ingested from **Azure SQL Database** into **Azure Data Lake Gen2** using **Azure Data Factory**, and transformations are performed using **Azure Databricks**.
 
-The project follows a modern ELT architecture, where raw data is incrementally ingested from an Azure SQL Database into a cloud data lake using Azure Data Factory, and transformed at scale using Azure Databricks.
+Architecture Overview
 
-This approach improves scalability, performance, and maintainability.
+Source: Azure SQL Database
+
+Ingestion: Azure Data Factory
+
+Storage: Azure Data Lake Gen2
+
+Transformations: Azure Databricks
+
+Table Format: Delta Lake
+
+Data flows through Bronze → Silver → Gold layers.
+---
+
+## Incremental Ingestion Pipeline (Azure Data Factory)
+
+**Source:** Azure SQL Database
+**Target:** Data Lake Gen2 (Bronze layer)
+
+<img width="573" alt="ADF Pipeline" src="https://github.com/user-attachments/assets/e74b3d5e-ec81-496e-ae74-e35264706f6e" />
+
+### Pipeline logic:
+
+* ForEach activity iterates over multiple source tables
+* Lookup activity (`last_cdc`) retrieves the last processed CDC value
+* Copy activity loads only new or updated records
+* If Condition activity checks for new records before loading
+
+<img width="600" alt="ADF Conditional Logic" src="https://github.com/user-attachments/assets/c5556148-e33c-4dab-a4ee-a4e4d8560556" />
 
 ---
 
-## Incremental Ingestion Pipeline (Azure Data Factory)(SQL DB to Data Lake Gen2)
-<img width="573" height="268" alt="Screenshot 2026-01-02 at 2 41 59 PM" src="https://github.com/user-attachments/assets/e74b3d5e-ec81-496e-ae74-e35264706f6e" />
+## Medallion Architecture
 
-
-The ingestion pipeline is implemented using **Azure Data Factory** and designed for **incremental loading**.
-
-### Pipeline Logic:
-
-* **ForEach activity** loops through multiple source tables
-* **Lookup activity (`last_cdc`)** retrieves the last processed CDC value
-* **Copy activity** moves only new or updated records from Azure SQL DB to the data lake(bronze layer)
-* **If Condition activity** checks whether new records exist before loading
-<img width="600" height="438" alt="Screenshot 2026-01-02 at 3 36 47 PM" src="https://github.com/user-attachments/assets/c5556148-e33c-4dab-a4ee-a4e4d8560556" />
+<img width="500" alt="Medallion Architecture" src="https://github.com/user-attachments/assets/b74caf7c-d30c-488a-973c-423ad7f68f35" />
 
 ---
 
-## Medallion Architecture & Databricks ELT Transformations
+## Bronze Layer
 
-<img width="500" height="133" alt="Screenshot 2026-01-02 at 5 57 39 PM" src="https://github.com/user-attachments/assets/b74caf7c-d30c-488a-973c-423ad7f68f35" />
-
-
-### 🥉 Bronze Layer – Raw Data Ingestion
-
-* Incremental data ingested from **Azure SQL Database** to **Azure Data Lake** using **Azure Data Factory**
-* Change Data Capture (CDC) logic ensures only new or updated records are processed
-* Raw data is stored without transformation to preserve source fidelity and enable reprocessing
+* Stores raw, incrementally ingested data
+* Data is loaded from Azure SQL Database using Azure Data Factory
+* No transformations are applied
+* Acts as the source for downstream Databricks processing
 
 ---
 
-### 🥈 Silver Layer – Cleansed & Enriched Data (Databricks)
+## Silver Layer (Databricks)
 
-Transformations are performed in Databricks using **Apache Spark** with a focus on reliability and scalability.
+* Data is read from the Bronze layer
+* Incremental processing is applied
+* Data cleansing, type casting, and deduplication are performed
+* Tables are written in Delta format
 
-**Key implementation details:**
+---
 
-* **Databricks Auto Loader** for incremental file ingestion from the data lake
-* **Spark Structured Streaming** to handle continuous data arrival
-* **Idempotent processing** to avoid duplicate records across re-runs
-* **Schema evolution support** to automatically adapt to upstream schema changes
-* Data quality checks, type casting, deduplication, and standardization
+## Gold Layer
 
-Transformation logic is modularized into reusable Databricks notebooks/scripts (included in the repository).
+* Gold tables are derived from Silver layer data
+* Data is structured for analytical use
+* Tables are stored in Delta format
+
+---
+
+## Star Schema
+
+* Gold layer tables follow a star schema
+* Fact tables store measurable data
+* Dimension tables store descriptive attributes
+* Fact tables reference dimensions using keys
+
+---
+
+## Slowly Changing Dimensions (SCD)
+
+* Slowly Changing Dimension logic is implemented for dimension tables
+* New records are inserted when attribute values change
+* Historical records are preserved
+* Current and historical records are identified using flags or date columns
+
+---
+
+## Metadata-Driven Pipelines (Jinja2)
+
+* Pipeline logic is parameterized using Jinja2 templates
+* Table names, columns, and paths are passed dynamically
+* Reduces hardcoded logic across notebooks and pipelines
+
+---
+
+## Databricks Incremental Data Load
+
+* Incremental updates are handled using Delta Lake
+* Existing records are updated and new records are inserted
+* Full table reloads are avoided
+
+---
+
+## Delta Live Tables (DLT)
+
+* Includes a Delta Live Tables (DLT) implementation
+* Tables are defined declaratively using SQL or Python
+* Demonstrates dependency handling within Databricks pipelines
+
+---
+
+## Databricks Asset Bundles
+
+* Databricks Asset Bundles are used to organize notebooks and jobs
+* Bundle configuration files define Databricks resources
+* Supports deployment using Databricks CLI
+* Enables version-controlled Databricks workflows
 
 ---
 
 
-
-
+Just tell me.
