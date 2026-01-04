@@ -144,7 +144,3 @@ Data flows through Bronze → Silver → Gold layers.
 * Supports deployment using Databricks CLI
 * Enables version-controlled Databricks workflows
 
----
-
-
-Just tell me.
